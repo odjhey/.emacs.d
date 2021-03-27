@@ -14,8 +14,8 @@
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/odjhey/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
+         "https://raw.githubusercontent.com/odjhey/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -224,12 +224,12 @@
   :custom
   (org-roam-directory "~/org/brain/")
   :bind (:map org-roam-mode-map
-          (("C-c n l" . org-roam)
-           ("C-c n f" . org-roam-find-file)
-           ("C-c n g" . org-roam-graph))
-          :map org-mode-map
-          (("C-c n i" . org-roam-insert))
-          (("C-c n I" . org-roam-insert-immediate))))
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n I" . org-roam-insert-immediate))))
 
 
 (use-package deft
@@ -359,7 +359,7 @@
 ;;            ("a" . auto-fill-mode))
 ;;
 ;;
-;; ;; These let you manage windows (splits)
+
 ;; (bind-keys :prefix-map my/windows-leader
 ;;            :prefix "s-="
 ;;            ("s" . split-window-below)
@@ -431,16 +431,16 @@ _p_rint
 
 
 (pretty-hydra-define hydra-clock
-                     (:hint nil :color teal :quit-key "q" :title (with-faicon "clock-o" "Clock" 1 -0.05))
-                     ("Action"
-                      (("c" org-clock-cancel "cancel")
-                       ("d" org-clock-display "display")
-                       ("e" org-clock-modify-effort-estimate "effort")
-                       ("i" org-clock-in "in")
-                       ("j" org-clock-goto "jump")
-                       ("o" org-clock-out "out")
-                       ("p" org-pomodoro "pomodoro")
-                       ("r" org-clock-report "report"))))
+  (:hint nil :color teal :quit-key "q" :title (with-faicon "clock-o" "Clock" 1 -0.05))
+  ("Action"
+   (("c" org-clock-cancel "cancel")
+    ("d" org-clock-display "display")
+    ("e" org-clock-modify-effort-estimate "effort")
+    ("i" org-clock-in "in")
+    ("j" org-clock-goto "jump")
+    ("o" org-clock-out "out")
+    ("p" org-pomodoro "pomodoro")
+    ("r" org-clock-report "report"))))
 
 
 ;; add hydra for org-refile/ing
@@ -463,3 +463,4 @@ _p_rint
 (winner-mode +1)
 (setq-default display-line-numbers-widen t)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(put 'narrow-to-region 'disabled nil)
