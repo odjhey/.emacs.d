@@ -30,7 +30,6 @@
 ;; `use-package' documentation for more info.
 (setq use-package-always-defer t)
 
-
 ;;; Packages
 
 (use-package evil-surround
@@ -91,12 +90,11 @@
 
 
 ;;(unless (memq window-system '(mac ns))
-(unless (string-equal system-type "darwin")
- (use-package parinfer-rust-mode
+(use-package parinfer-rust-mode
    :init
    (setq parinfer-rust-library "~/.emacs.d/parinfer-rust/parinfer-rust-darwin.so")
    (setq parinfer-rust-auto-download nil)
-   :hook emacs-lisp-mode))
+   :hook emacs-lisp-mode)
 
 
 (use-package magit
@@ -105,7 +103,10 @@
 
 
 (use-package org
-  :ensure t)
+   :ensure t
+   :config
+   (setq org-agenda-files (list "~/org/work.org"
+                                "~/org/index.org")))
 
 
 (use-package rainbow-delimiters
@@ -124,6 +125,7 @@
 ;; modeline
 (use-package all-the-icons
   :ensure t)
+
 
 (use-package doom-modeline
   :ensure t
@@ -193,7 +195,6 @@
 ;;  ("s-<right>" . end-of-visual-line))
 
 
-
 ;; Buffer management / navigation
 ;; (bind-keys
 ;;  ("s-b" . switch-to-buffer)
@@ -210,8 +211,8 @@
 ;;            ("h" . hl-line-mode)
 ;;            ("l" . display-line-numbers-mode)
 ;;            ("a" . auto-fill-mode))
-;;
-;;
+
+
 ;; ;; These let you manage windows (splits)
 ;; (bind-keys :prefix-map my/windows-leader
 ;;            :prefix "s-="
