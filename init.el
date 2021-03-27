@@ -127,7 +127,10 @@
 
 
 (use-package org
-  :ensure t)
+  :ensure t
+  :config
+  (setq org-agenda-files (list "~/org/work.org"
+                               "~/org/index.org")))
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
@@ -195,6 +198,15 @@
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
 
+;; modeline
+(use-package all-the-icons
+  :ensure t)
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-model-icon nil))
 
 (use-package org-roam
   :ensure t
