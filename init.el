@@ -14,8 +14,8 @@
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/odjhey/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
+           "https://raw.githubusercontent.com/odjhey/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -139,6 +139,13 @@
                              (append org-babel-load-languages '(
                                                                 (shell . t))))
 
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
+
+(org-babel-do-load-languages 'org-babel-load-languages
+                             (append org-babel-load-languages '(
+                                                                (shell . t))))
+
 
 (use-package rainbow-delimiters
   :ensure t
@@ -198,6 +205,7 @@
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
 
+
 ;; modeline
 (use-package all-the-icons
   :ensure t)
@@ -208,6 +216,7 @@
   :config
   (setq doom-modeline-model-icon nil))
 
+
 (use-package org-roam
   :ensure t
   :hook
@@ -215,12 +224,12 @@
   :custom
   (org-roam-directory "~/org/brain/")
   :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))
-              (("C-c n I" . org-roam-insert-immediate))))
+          (("C-c n l" . org-roam)
+           ("C-c n f" . org-roam-find-file)
+           ("C-c n g" . org-roam-graph))
+          :map org-mode-map
+          (("C-c n i" . org-roam-insert))
+          (("C-c n I" . org-roam-insert-immediate))))
 
 
 (use-package deft
