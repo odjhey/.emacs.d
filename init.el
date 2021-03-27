@@ -127,7 +127,17 @@
 
 
 (use-package org
-  :ensure t)
+  :ensure t
+  :config
+  (setq org-agenda-files (list "~/org/work.org"
+                               "~/org/index.org")))
+
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
+
+(org-babel-do-load-languages 'org-babel-load-languages
+                             (append org-babel-load-languages '(
+                                                                (shell . t))))
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
