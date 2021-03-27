@@ -254,6 +254,11 @@
         org-journal-date-format "%A, %d %B %Y"))
 
 
+(use-package undo-tree
+  :ensure t
+  :config
+  (global-undo-tree-mode))
+
 ;;; for evaluation
 ;; org-super-agenda
 
@@ -429,6 +434,8 @@ _p_rint
   ("g" org-capture-goto-last-stored))
 
 
+(defun with-faicon (icon str &optional height v-adjust)
+  (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
 (pretty-hydra-define hydra-clock
   (:hint nil :color teal :quit-key "q" :title (with-faicon "clock-o" "Clock" 1 -0.05))
@@ -443,6 +450,17 @@ _p_rint
     ("r" org-clock-report "report"))))
 
 
+(pretty-hydra-define hydra-toggles
+  (:color amaranth :quit-key "q" :title (with-faicon "toggle-on" "Titel"))
+  ("Basic"
+   (("n" display-line-numbers-mode "line number" :toggle t)
+    ("w" whitespace-mode "whitespace" :toggle t)
+    ("r" rainbow-delimiters-mode "rainbow parens" :toggle t)
+    ("g" git-gutter-mode "git gutter" :toggle t)
+    ("|" display-fill-column-indicator-mode "column margin" :toggle t))
+   "Highlight"
+   (("l" hl-line-mode "line" :toggle t))))
+
 ;; add hydra for org-refile/ing
 
 
@@ -453,14 +471,18 @@ _p_rint
  ;; hydras first
  "p" '(hydra-projectile/body :which-key "projectile")
  "i" '(hydra-global-org/body :which-key "timers")
+ "/" '(hydra-toggles/body :which-key "toggles")
  "t" '(projectile-find-file :which-key "projectile-find-file")
  "f" '(:ignore t :which-key "Files")
  "ff" '(find-file :which-key "find-file")
  "g" '(:ignore t :which-key "magit")
  "gg" '(magit-status :which-key "magit"))
 
-
 (winner-mode +1)
+
 (setq-default display-line-numbers-widen t)
+(setq-default display-fill-column-indicator-mode t)
+(setq display-line-numbers-type 'relative)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
 (put 'narrow-to-region 'disabled nil)
