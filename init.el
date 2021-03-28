@@ -14,8 +14,8 @@
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/odjhey/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
+         "https://raw.githubusercontent.com/odjhey/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -59,22 +59,17 @@
   (progn
     (global-evil-surround-mode 1)))
 
+(use-package evil-snipe
+  :ensure t
+  :config
+  (evil-snipe-mode +1)
+  (evil-snipe-override-mode +1))
+
 
 (use-package which-key
   :ensure t
   :init
   (which-key-mode t))
-
-
-;; bye bye -> bc of the killer combo general + hydar
-;; (use-package bind-key
-;;              :ensure t
-;;              :demand)
-
-
-;; (use-package whole-line-or-region
-;;   :init
-;;   (whole-line-or-region-global-mode 1))
 
 
 (use-package selectrum
@@ -214,8 +209,16 @@
   :ensure t
   :init (doom-modeline-mode 1)
   :config
-  (setq doom-modeline-model-icon nil))
-
+  (setq doom-modeline-modal-icon nil)
+  (setq doom-modeline-icon (display-graphic-p))
+  (setq doom-modeline-buffer-state-icon nil)
+  (setq doom-modeline-buffer-modification-icon t)
+  (setq evil-normal-state-tag   (propertize "[Normal]")
+        evil-emacs-state-tag    (propertize "[Emacs]")
+        evil-insert-state-tag   (propertize "[Insert]")
+        evil-motion-state-tag   (propertize "[Motion]")
+        evil-visual-state-tag   (propertize "[Visual]")
+        evil-operator-state-tag (propertize "[Operator]"))) 
 
 (use-package org-roam
   :ensure t
@@ -224,12 +227,12 @@
   :custom
   (org-roam-directory "~/org/brain/")
   :bind (:map org-roam-mode-map
-          (("C-c n l" . org-roam)
-           ("C-c n f" . org-roam-find-file)
-           ("C-c n g" . org-roam-graph))
-          :map org-mode-map
-          (("C-c n i" . org-roam-insert))
-          (("C-c n I" . org-roam-insert-immediate))))
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n I" . org-roam-insert-immediate))))
 
 
 (use-package deft
@@ -253,6 +256,19 @@
   (setq org-journal-dir "~/org/journal/"
         org-journal-date-format "%A, %d %B %Y"))
 
+
+(use-package undo-tree
+  :ensure t
+  :config
+  (global-undo-tree-mode 1))
+
+
+(use-package origami
+  :ensure t
+  :config
+  (origami-mode 1))
+
+;;; Packages-End
 
 ;;; for evaluation
 ;; org-super-agenda
@@ -306,48 +322,10 @@
 (setq mac-right-option-modifier 'nil)
 
 
-;;; Settings
-
-;; Discovering the exact behavior of these settings is left as an exercise for
-;; the reader. Documentation can be found with "C-h o <symbol>".
-;; (delete-selection-mode t)
-;; (global-visual-line-mode t)
-;; (setq-default truncate-lines t)
-
-;; (global-auto-revert-mode t)
 
 
 ;;; Keybindings
 
-;; Make Esc do the right thing
-;; (define-key key-translation-map (kbd "ESC") (kbd "C-g")) ;; does not work on -nw
-
-;; These are to make Emacs more predicable in MacOS
-;; (bind-keys
-;;  ("s-n" . make-frame-command)
-;;  ("s-m" . iconify-frame)
-;;  ("s-s" . save-buffer)
-;;  ("s-o" . find-file)
-;;  ("s-w" . delete-frame)
-;;  ("s-q" . save-buffers-kill-terminal)
-;;  ("s-a" . mark-whole-buffer)
-;;  ("s-z" . undo-only) ;; Why no redo? Read up on it.
-;;  ("s-x" . kill-region)
-;;  ("s-c" . kill-ring-save)
-;;  ("s-v" . yank)
-;;  ("s-<up>" . beginning-of-buffer)
-;;  ("s-<down>" . end-of-buffer)
-;;  ("s-<left>" . beginning-of-visual-line)
-;;  ("s-<right>" . end-of-visual-line))
-
-
-;; Buffer management / navigation
-;; (bind-keys
-;;  ("s-b" . switch-to-buffer)
-;;  ("s-B" . ibuffer)
-;;  ("s-[" . previous-buffer)
-;;  ("s-]" . next-buffer)
-;;  ("s-k" . kill-this-buffer))
 
 
 ;; ;; These are handy display toggles
@@ -359,7 +337,7 @@
 ;;            ("a" . auto-fill-mode))
 ;;
 ;;
-;; ;; These let you manage windows (splits)
+
 ;; (bind-keys :prefix-map my/windows-leader
 ;;            :prefix "s-="
 ;;            ("s" . split-window-below)
@@ -429,37 +407,78 @@ _p_rint
   ("g" org-capture-goto-last-stored))
 
 
+(defun with-faicon (icon str &optional height v-adjust)
+  (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
 (pretty-hydra-define hydra-clock
-                     (:hint nil :color teal :quit-key "q" :title (with-faicon "clock-o" "Clock" 1 -0.05))
-                     ("Action"
-                      (("c" org-clock-cancel "cancel")
-                       ("d" org-clock-display "display")
-                       ("e" org-clock-modify-effort-estimate "effort")
-                       ("i" org-clock-in "in")
-                       ("j" org-clock-goto "jump")
-                       ("o" org-clock-out "out")
-                       ("p" org-pomodoro "pomodoro")
-                       ("r" org-clock-report "report"))))
+  (:hint nil :color teal :quit-key "q" :title (with-faicon "clock-o" "Clock" 1 -0.05))
+  ("Action"
+   (("c" org-clock-cancel "cancel")
+    ("d" org-clock-display "display")
+    ("e" org-clock-modify-effort-estimate "effort")
+    ("i" org-clock-in "in")
+    ("j" org-clock-goto "jump")
+    ("o" org-clock-out "out")
+    ("p" org-pomodoro "pomodoro")
+    ("r" org-clock-report "report"))))
 
+
+(pretty-hydra-define hydra-toggles
+  (:color amaranth :quit-key "q" :title (with-faicon "toggle-on" "Toogs"))
+  ("Basic"
+   (("n" display-line-numbers-mode "line number" :toggle t)
+    ("w" whitespace-mode "whitespace" :toggle t)
+    ("W" visual-line-mode "wrap" :toggle t)
+    ("r" rainbow-delimiters-mode "rainbow parens" :toggle t)
+    ("g" git-gutter-mode "git gutter" :toggle t)
+    ("|" display-fill-column-indicator-mode "column margin" :toggle t))
+   "Highlight"
+   (("l" hl-line-mode "line" :toggle t))))
+
+(pretty-hydra-define hydra-control-tower
+  (:color red :quit-key "q" :title "Control-Tower")
+  ("Zoom"
+   (("=" text-scale-increase "zoom-in")
+    ("-" text-scale-decrease "zoom-out"))
+   "Editor"
+   (("r" read-only-mode "read-only c-x c-q"))))
+
+;; Buffer management / navigation
+;; (bind-keys
+;;  ("s-b" . switch-to-buffer)
+;;  ("s-B" . ibuffer)
+;;  ("s-k" . kill-this-buffer))
+(pretty-hydra-define hydra-buffer
+  (:color blue :quit-key "q" :title "buffers")
+  ("Buffer"
+    (("b" switch-to-buffer "switch-to-buffer"))))
 
 ;; add hydra for org-refile/ing
 
-
-(general-define-key
- :states '(normal visual insert emacs)
+(general-define-key :states '(normal visual insert emacs)
  :prefix "SPC"
  :non-normal-prefix "M-SPC"
  ;; hydras first
  "p" '(hydra-projectile/body :which-key "projectile")
  "i" '(hydra-global-org/body :which-key "timers")
+ "/" '(hydra-toggles/body :which-key "toggles")
  "t" '(projectile-find-file :which-key "projectile-find-file")
- "f" '(:ignore t :which-key "Files")
- "ff" '(find-file :which-key "find-file")
- "g" '(:ignore t :which-key "magit")
- "gg" '(magit-status :which-key "magit"))
-
+ "f" '(avy-goto-char-timer :which-key "goto char")
+ "g" '(magit-status :which-key "magit")
+ "c" '(hydra-control-tower/body :which-key "control tower")
+ "b" '(hydra-buffer/body :which-key "buffers"))
 
 (winner-mode +1)
-(setq-default display-line-numbers-widen t)
+
+(global-display-fill-column-indicator-mode 1)
+(global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
+(global-visual-line-mode t)
+(global-auto-revert-mode t)
+(setq-default truncate-lines t)
+
+(setq display-line-numbers-widen t)
+;; (setq display-line-numbers-type 'relative)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(put 'narrow-to-region 'disabled nil)
