@@ -59,22 +59,17 @@
   (progn
     (global-evil-surround-mode 1)))
 
+(use-package evil-snipe
+  :ensure t
+  :config
+  (evil-snipe-mode +1)
+  (evil-snipe-override-mode +1))
+
 
 (use-package which-key
   :ensure t
   :init
   (which-key-mode t))
-
-
-;; bye bye -> bc of the killer combo general + hydar
-;; (use-package bind-key
-;;              :ensure t
-;;              :demand)
-
-
-;; (use-package whole-line-or-region
-;;   :init
-;;   (whole-line-or-region-global-mode 1))
 
 
 (use-package selectrum
@@ -257,7 +252,15 @@
 (use-package undo-tree
   :ensure t
   :config
-  (global-undo-tree-mode))
+  (global-undo-tree-mode 1))
+
+
+(use-package origami
+  :ensure t
+  :config
+  (origami-mode 1))
+
+;;; Packages-End
 
 ;;; for evaluation
 ;; org-super-agenda
@@ -311,48 +314,10 @@
 (setq mac-right-option-modifier 'nil)
 
 
-;;; Settings
-
-;; Discovering the exact behavior of these settings is left as an exercise for
-;; the reader. Documentation can be found with "C-h o <symbol>".
-;; (delete-selection-mode t)
-;; (global-visual-line-mode t)
-;; (setq-default truncate-lines t)
-
-;; (global-auto-revert-mode t)
 
 
 ;;; Keybindings
 
-;; Make Esc do the right thing
-;; (define-key key-translation-map (kbd "ESC") (kbd "C-g")) ;; does not work on -nw
-
-;; These are to make Emacs more predicable in MacOS
-;; (bind-keys
-;;  ("s-n" . make-frame-command)
-;;  ("s-m" . iconify-frame)
-;;  ("s-s" . save-buffer)
-;;  ("s-o" . find-file)
-;;  ("s-w" . delete-frame)
-;;  ("s-q" . save-buffers-kill-terminal)
-;;  ("s-a" . mark-whole-buffer)
-;;  ("s-z" . undo-only) ;; Why no redo? Read up on it.
-;;  ("s-x" . kill-region)
-;;  ("s-c" . kill-ring-save)
-;;  ("s-v" . yank)
-;;  ("s-<up>" . beginning-of-buffer)
-;;  ("s-<down>" . end-of-buffer)
-;;  ("s-<left>" . beginning-of-visual-line)
-;;  ("s-<right>" . end-of-visual-line))
-
-
-;; Buffer management / navigation
-;; (bind-keys
-;;  ("s-b" . switch-to-buffer)
-;;  ("s-B" . ibuffer)
-;;  ("s-[" . previous-buffer)
-;;  ("s-]" . next-buffer)
-;;  ("s-k" . kill-this-buffer))
 
 
 ;; ;; These are handy display toggles
@@ -451,21 +416,36 @@ _p_rint
 
 
 (pretty-hydra-define hydra-toggles
-  (:color amaranth :quit-key "q" :title (with-faicon "toggle-on" "Titel"))
+  (:color amaranth :quit-key "q" :title (with-faicon "toggle-on" "Toogs"))
   ("Basic"
    (("n" display-line-numbers-mode "line number" :toggle t)
     ("w" whitespace-mode "whitespace" :toggle t)
+    ("W" visual-line-mode "wrap" :toggle t)
     ("r" rainbow-delimiters-mode "rainbow parens" :toggle t)
     ("g" git-gutter-mode "git gutter" :toggle t)
     ("|" display-fill-column-indicator-mode "column margin" :toggle t))
    "Highlight"
    (("l" hl-line-mode "line" :toggle t))))
 
+(pretty-hydra-define hydra-control-tower
+  (:color red :quit-key "q" :title "Control-Tower")
+  ("Zoom"
+   (("=" text-scale-increase "zoom-in")
+    ("-" text-scale-decrease "zoom-out"))))
+
+;; Buffer management / navigation
+;; (bind-keys
+;;  ("s-b" . switch-to-buffer)
+;;  ("s-B" . ibuffer)
+;;  ("s-k" . kill-this-buffer))
+(pretty-hydra-define hydra-buffer
+  (:color blue :quit-key "q" :title "buffers")
+  ("Buffer"
+    (("b" switch-to-buffer "switch-to-buffer"))))
+
 ;; add hydra for org-refile/ing
 
-
-(general-define-key
- :states '(normal visual insert emacs)
+(general-define-key :states '(normal visual insert emacs)
  :prefix "SPC"
  :non-normal-prefix "M-SPC"
  ;; hydras first
@@ -473,16 +453,22 @@ _p_rint
  "i" '(hydra-global-org/body :which-key "timers")
  "/" '(hydra-toggles/body :which-key "toggles")
  "t" '(projectile-find-file :which-key "projectile-find-file")
- "f" '(:ignore t :which-key "Files")
- "ff" '(find-file :which-key "find-file")
- "g" '(:ignore t :which-key "magit")
- "gg" '(magit-status :which-key "magit"))
+ "f" '(avy-goto-char-timer :which-key "goto char")
+ "g" '(magit-status :which-key "magit")
+ "c" '(hydra-control-tower/body :which-key "control tower")
+ "b" '(hydra-buffer/body :which-key "buffers"))
 
 (winner-mode +1)
 
-(setq-default display-line-numbers-widen t)
-(setq-default display-fill-column-indicator-mode t)
-(setq display-line-numbers-type 'relative)
+(global-display-fill-column-indicator-mode 1)
+(global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
+(global-visual-line-mode t)
+(global-auto-revert-mode t)
+(setq-default truncate-lines t)
+
+(setq display-line-numbers-widen t)
+;; (setq display-line-numbers-type 'relative)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 (put 'narrow-to-region 'disabled nil)
