@@ -126,7 +126,7 @@
   :config
   (setq org-agenda-files (list "~/org/work.org"
                                "~/org/index.org"))
-  (org-archive-location) "org/archive/%s_archive::")
+  (setq org-archive-location "org/archive/%s_archive::"))
 
 
 (use-package org-bullets
@@ -273,14 +273,17 @@
           (setq save-place-file "~/.emacs.d/saveplace")
           (save-place-mode 1)))
 
+
 (use-package volatile-highlights
   :ensure t
   :init (progn
-          (vhl/define-extension
+          (volatile-highlights-mode 1))
+  :config (progn
+            (vhl/define-extension
              'evil 'evil-paste-after 'evil-paste-before
              'evil-paste-pop 'evil-move)
-          (volatile-highlights-mode 1)
-          (vhl/install-extension 'evil)))
+            (vhl/install-extension 'evil)))
+
 
 ;;; for evaluation
 ;; org-super-agenda
@@ -338,7 +341,8 @@
 (setq mac-right-option-modifier 'nil)
 
 
-(set-face-attribute 'whitespace-space nil :background nil :foreground "gray20")
+(whitespace-mode 1)
+(set-face-attribute 'whitespace-space  nil :background nil :foreground "gray20")
 (set-face-attribute 'whitespace-newline nil :background nil :foreground "gray30")
 (setq whitespace-display-mappings
   ;; all numbers are Unicode codepoint in decimal. ⁖ (insert-char 182 1)
@@ -346,11 +350,8 @@
     ;;(newline-mark 10 [182 10]) ; 10 LINE FEED
     (newline-mark ?\n  [?¬ ?\n]  [?$ ?\n])  ; eol - negation
     (tab-mark 9 [9655 9] [92 9]))) ; 9 TAB, 9655 WHITE RIGHT-POINTING TRIANGLE 「▷」
-(whitespace-mode 1)
 
 ;;; Keybindings
-
-
 
 ;; ;; These are handy display toggles
 ;; (bind-keys :prefix-map my/global-leader
@@ -359,8 +360,6 @@
 ;;            ("h" . hl-line-mode)
 ;;            ("l" . display-line-numbers-mode)
 ;;            ("a" . auto-fill-mode))
-;;
-;;
 
 ;; (bind-keys :prefix-map my/windows-leader
 ;;            :prefix "s-="
