@@ -125,7 +125,9 @@
   :ensure t
   :config
   (setq org-agenda-files (list "~/org/work.org"
-                               "~/org/index.org")))
+                               "~/org/index.org"))
+  (org-archive-location) "org/archive/%s_archive::")
+
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
@@ -133,14 +135,6 @@
 (org-babel-do-load-languages 'org-babel-load-languages
                              (append org-babel-load-languages '(
                                                                 (shell . t))))
-
-(use-package org-bullets
-  :hook (org-mode . org-bullets-mode))
-
-(org-babel-do-load-languages 'org-babel-load-languages
-                             (append org-babel-load-languages '(
-                                                                (shell . t))))
-
 
 (use-package rainbow-delimiters
   :ensure t
@@ -218,7 +212,7 @@
         evil-insert-state-tag   (propertize "[Insert]")
         evil-motion-state-tag   (propertize "[Motion]")
         evil-visual-state-tag   (propertize "[Visual]")
-        evil-operator-state-tag (propertize "[Operator]"))) 
+        evil-operator-state-tag (propertize "[Operator]")))
 
 (use-package org-roam
   :ensure t
@@ -259,6 +253,9 @@
 
 (use-package undo-tree
   :ensure t
+  :init
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t)
   :config
   (global-undo-tree-mode 1))
 
@@ -268,10 +265,28 @@
   :config
   (origami-mode 1))
 
-;;; Packages-End
+
+;; Save point position in files
+(use-package saveplace
+  :ensure t
+  :init (progn
+          (setq save-place-file "~/.emacs.d/saveplace")
+          (save-place-mode 1)))
+
+(use-package volatile-highlights
+  :ensure t
+  :init (progn
+          (vhl/define-extension
+             'evil 'evil-paste-after 'evil-paste-before
+             'evil-paste-pop 'evil-move)
+          (volatile-highlights-mode 1)
+          (vhl/install-extension 'evil)))
 
 ;;; for evaluation
 ;; org-super-agenda
+
+
+;;; Packages-End
 
 
 ;;; base
@@ -279,6 +294,7 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (show-paren-mode)
+(setq initial-scratch-message ";; *SCRATCH*")
 
 
 ;; Show columns in addition to rows in mode line
@@ -322,7 +338,15 @@
 (setq mac-right-option-modifier 'nil)
 
 
-
+(set-face-attribute 'whitespace-space nil :background nil :foreground "gray20")
+(set-face-attribute 'whitespace-newline nil :background nil :foreground "gray30")
+(setq whitespace-display-mappings
+  ;; all numbers are Unicode codepoint in decimal. ⁖ (insert-char 182 1)
+  '((space-mark 32 [183] [46]) ; 32 SPACE 「 」, 183 MIDDLE DOT 「·」, 46 FULL STOP 「.」
+    ;;(newline-mark 10 [182 10]) ; 10 LINE FEED
+    (newline-mark ?\n  [?¬ ?\n]  [?$ ?\n])  ; eol - negation
+    (tab-mark 9 [9655 9] [92 9]))) ; 9 TAB, 9655 WHITE RIGHT-POINTING TRIANGLE 「▷」
+(whitespace-mode 1)
 
 ;;; Keybindings
 
@@ -435,6 +459,7 @@ _p_rint
    "Highlight"
    (("l" hl-line-mode "line" :toggle t))))
 
+
 (pretty-hydra-define hydra-control-tower
   (:color red :quit-key "q" :title "Control-Tower")
   ("Zoom"
@@ -480,5 +505,19 @@ _p_rint
 (setq display-line-numbers-widen t)
 ;; (setq display-line-numbers-type 'relative)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+
+(setq org-default-notes-file "~/org/my.org")
+
+
+;; Org capture
+(load-file
+ (concat
+  (file-name-directory user-emacs-directory)
+  "orgcapture.el"))
+
+
+(setq frame-resize-pixelwise t)
+
 
 (put 'narrow-to-region 'disabled nil)

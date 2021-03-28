@@ -3,4 +3,5 @@ parinfer-rust/
 straight/
 var/
 etc/
+saveplace
 custom.el
