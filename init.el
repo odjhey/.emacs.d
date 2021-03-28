@@ -209,8 +209,16 @@
   :ensure t
   :init (doom-modeline-mode 1)
   :config
-  (setq doom-modeline-model-icon nil))
-
+  (setq doom-modeline-modal-icon nil)
+  (setq doom-modeline-icon (display-graphic-p))
+  (setq doom-modeline-buffer-state-icon nil)
+  (setq doom-modeline-buffer-modification-icon t)
+  (setq evil-normal-state-tag   (propertize "[Normal]")
+        evil-emacs-state-tag    (propertize "[Emacs]")
+        evil-insert-state-tag   (propertize "[Insert]")
+        evil-motion-state-tag   (propertize "[Motion]")
+        evil-visual-state-tag   (propertize "[Visual]")
+        evil-operator-state-tag (propertize "[Operator]"))) 
 
 (use-package org-roam
   :ensure t
@@ -431,7 +439,9 @@ _p_rint
   (:color red :quit-key "q" :title "Control-Tower")
   ("Zoom"
    (("=" text-scale-increase "zoom-in")
-    ("-" text-scale-decrease "zoom-out"))))
+    ("-" text-scale-decrease "zoom-out"))
+   "Editor"
+   (("r" read-only-mode "read-only c-x c-q"))))
 
 ;; Buffer management / navigation
 ;; (bind-keys
