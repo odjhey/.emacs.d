@@ -323,6 +323,14 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
                                    (when smerge-mode
                                      (unpackaged/smerge-hydra/body)))))
 
+;;(use-package ox-taskjuggler
+;;  :load-path "lisp/")
+(load-file "~/.emacs.d/lisp/ox-taskjuggler.el")
+
+;; (use-package ox-taskjuggler
+;;   :ensure t)
+;; (require 'ox-taskjuggler)
+
 
 ;;; for evaluation
 ;; org-super-agenda
@@ -447,9 +455,9 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (defhydra hydra-global-org (:color blue
                                    :hint nil)
   "
-Timer^^        ^Clock^         ^Capture^
---------------------------------------------------
-s_t_art        _i_ clock in    _c_apture
+Timer^^        ^Clock^         ^Capture^          ^Others^^^
+-------------------------------------------------------------------
+s_t_art        _i_ clock in    _c_apture          _e_stimate
  _s_top        _o_ clock out   _g_ last capture
 _r_eset        _j_ clock goto
 _p_rint
@@ -466,7 +474,8 @@ _p_rint
   ;; Visit the clocked task from any buffer
   ("j" org-clock-goto)
   ("c" org-capture)
-  ("g" org-capture-goto-last-stored))
+  ("g" org-capture-goto-last-stored)
+  ("e" org-set-effort))
 
 
 (defun with-faicon (icon str &optional height v-adjust)
@@ -588,6 +597,5 @@ Git gutter:
 
 
 (setq frame-resize-pixelwise t)
-
 
 (put 'narrow-to-region 'disabled nil)
