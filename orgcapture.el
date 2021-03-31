@@ -3,9 +3,9 @@
       '(("t"              ; hotkey
           "Todo list item" ; name
           entry            ; type
-          (file+headline org-default-notes-file "comment Unfiled")
+          ;; (file+headline org-default-notes-file "comment Unfiled")
+          (file+headline "~/org/notes.org" "comment Unfiled")
           "* TODO %?\n \n%U %i\n %a") ;template
-
 
         ("w" ; hotkey
           "(Work) Todo list item" ; name
@@ -20,10 +20,11 @@
         ("a" "Attendance"
           entry (file+olp+datetree "~/org/journal.org" "Attendance")
           "***** %U\n%?")
+
         ("z" ; hotkey
           "capture madness" ; name
           entry ; type
-          (file+headline org-default-notes-file "comment Unfiled")
+          ;; (file+headline org-default-notes-file "comment Unfiled")
           "* TODO %?\n %U\n %i\n %a %(progn (delete-other-windows) \"\")")
 
         ("m" "email" entry (file+olp org-default-notes-file "comment Unfiled" "mail")

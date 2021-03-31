@@ -125,8 +125,9 @@
   :ensure t
   :config
   (setq org-agenda-files (list "~/org/work.org"
-                               "~/org/index.org"))
-  (setq org-archive-location "org/archive/%s_archive::"))
+                               "~/org/personal.org"
+                               "~/org/my.org"))
+  (setq org-archive-location "~/org/archive/%s_archive::"))
 
 
 (use-package org-bullets
@@ -170,12 +171,15 @@
 
 
 ;; Expand-region allows to gradually expand selection inside words, sentences, etc
-(use-package expand-region)
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
 
 
 (use-package js2-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+;; look into adding these
+;; https://emacs.cafe/emacs/javascript/setup/2017/04/23/emacs-setup-javascript.html
 
 
 (use-package git-gutter)
@@ -205,14 +209,15 @@
   :config
   (setq doom-modeline-modal-icon nil)
   (setq doom-modeline-icon (display-graphic-p))
-  (setq doom-modeline-buffer-state-icon nil)
+  (setq doom-modeline-buffer-state-icon t)
   (setq doom-modeline-buffer-modification-icon t)
   (setq evil-normal-state-tag   (propertize "[Normal]")
-        evil-emacs-state-tag    (propertize "[Emacs]")
-        evil-insert-state-tag   (propertize "[Insert]")
-        evil-motion-state-tag   (propertize "[Motion]")
-        evil-visual-state-tag   (propertize "[Visual]")
-        evil-operator-state-tag (propertize "[Operator]")))
+       evil-emacs-state-tag    (propertize "[Emacs]")
+       evil-insert-state-tag   (propertize "[Insert]")
+       evil-motion-state-tag   (propertize "[Motion]")
+       evil-visual-state-tag   (propertize "[Visual]")
+       evil-operator-state-tag (propertize "[Operator]")))
+
 
 (use-package org-roam
   :ensure t
@@ -331,10 +336,64 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 ;;   :ensure t)
 ;; (require 'ox-taskjuggler)
 
+;; try embark, consult
+(use-package embark
+  :ensure t)
+
+(use-package consult)
+;; :config
+;; (autoload 'projectile-project-root "projectile")
+;; (setq consult-project-root-function #'projectile-project-root))
+
+;; orderless.el
+;; unsure what this could offer, im happy with
+;; prescients fuzzy for now
+
+;; im not yet ready for this haha
+;;(use-package flycheck
+;;  :ensure t
+;;  :init (global-flycheck-mode))
+
+(use-package company
+  :ensure t
+  :init (global-company-mode))
+
+(use-package company-lsp
+  :after
+  (push 'company-lsp company-backends))
+
 
 ;;; for evaluation
 ;; org-super-agenda
 
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode t))
+
+;;; for window management
+;; look at the ff: switch-window.el golden-ratio.el
+
+(use-package ibuffer-vc                 ; Group buffers by VC project and status
+  :ensure t
+  :defer t
+  :init (add-hook 'ibuffer-hook
+          (lambda ()
+            (ibuffer-vc-set-filter-groups-by-vc-root)
+            (unless (eq ibuffer-sorting-mode 'alphabetic)
+              (ibuffer-do-sort-by-alphabetic)))))
+
+(use-package zen-mode
+  :straight (zen-mode :type git :host github :repo "aki237/zen-mode"))
+
+;; look at ^cwm- to customize
+(use-package centered-window :ensure t)
+
+(use-package olivetti :ensure t)
+
+(use-package persistent-scratch :ensure t)
+
+;; checkout xr.el
 
 ;;; Packages-End
 
@@ -479,6 +538,7 @@ _p_rint
 
 
 (defun with-faicon (icon str &optional height v-adjust)
+  "Idk what this does ICON STR HEIGHT V-ADJUST."
   (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
 (pretty-hydra-define hydra-clock
@@ -570,7 +630,6 @@ Git gutter:
  "c" '(hydra-control-tower/body :which-key "control tower")
  "b" '(hydra-buffer/body :which-key "buffers")
  "y" '(hydra-git-gutter/body :which-key "git gutter"))
- 
 
 (winner-mode +1)
 
@@ -585,9 +644,7 @@ Git gutter:
 ;; (setq display-line-numbers-type 'relative)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-
 (setq org-default-notes-file "~/org/my.org")
-
 
 ;; Org capture
 (load-file
@@ -599,3 +656,5 @@ Git gutter:
 (setq frame-resize-pixelwise t)
 
 (put 'narrow-to-region 'disabled nil)
+
+;;; init.el ends here
