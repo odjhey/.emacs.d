@@ -437,6 +437,11 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (use-package spatial-navigate
   :ensure t)
 
+(general-define-key
+ :states 'normal
+ "C-j" 'spatial-navigate-forward-vertical-bar
+ "C-k" 'spatial-navigate-backward-vertical-bar)
+
 ;; rethinnk about this, marks is better imo
 (use-package bm
   :ensure t
