@@ -5,3 +5,4 @@ var/
 etc/
 saveplace
 custom.el
+elpa/
