@@ -33,6 +33,14 @@
 
 ;;; Packages
 
+(use-package no-littering
+  :ensure t
+  :demand t
+  :config)
+
+(setq auto-save-file-name-transforms
+  `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
 (use-package general
   :ensure t)
 
@@ -139,6 +147,7 @@
   (setq magit-repository-directories '(("\~/proj/" . 4) ("\~/proj/work/" . 4))))
 
 
+;; -- ORG Stuff! ---
 (use-package org
   :ensure t
   :config
@@ -151,21 +160,51 @@
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
-(org-babel-do-load-languages 'org-babel-load-languages
-                             (append org-babel-load-languages '(
-                                                                (shell . t))))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ (append org-babel-load-languages
+        '((shell . t))))
+
+(use-package org-roam
+  :ensure t
+  :hook
+  (after-init . org-roam-mode)
+  :custom
+  (org-roam-directory "~/org/brain/")
+  :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n I" . org-roam-insert-immediate))))
+
+(use-package deft
+  :after org
+  :bind
+  ("C-c n d" . deft)
+  :custom
+  (deft-recursive t)
+  (deft-use-filter-string-for-filename t)
+  (deft-default-extension "org")
+  (deft-directory "~/org/"))
+
+(use-package org-journal
+  :ensure t
+  :init
+  ;; Change default prefix key; needs to be set before loading org-journal
+  (setq org-journal-prefix-key "C-c j")
+  :config
+  (setq org-journal-dir "~/org/journal/"
+        org-journal-date-format "%A, %d %B %Y"))
+
+;; END <-- ORG Stuff! ---
 
 (use-package rainbow-delimiters
   :ensure t
   :init
   (progn
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
-
-
-(use-package no-littering
-  :ensure t
-  :demand t
-  :config)
 
 
 ;; I want Emacs kill ring and system clipboard to be independent. Simpleclip is the solution to that.
@@ -176,7 +215,6 @@
 
 ;; Avy for fast navigation.
 (use-package avy
-  :defer t
   :config)
 
 
@@ -198,7 +236,6 @@
 
 
 (use-package add-node-modules-path
-  :defer t
   :hook (((js2-mode rjsx-mode) . add-node-modules-path)))
 
 ;; flycheck-eslint still not working :/
@@ -236,7 +273,6 @@
 
 ;; optionally
 (use-package lsp-ui
-  :defer t
   :commands lsp-ui-mode)
 
 
@@ -259,42 +295,6 @@
         evil-visual-state-tag   (propertize "[Visual]")
         evil-operator-state-tag (propertize "[Operator]")))
 
-
-(use-package org-roam
-  :ensure t
-  :hook
-  (after-init . org-roam-mode)
-  :custom
-  (org-roam-directory "~/org/brain/")
-  :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))
-              (("C-c n I" . org-roam-insert-immediate))))
-
-
-(use-package deft
-  :after org
-  :bind
-  ("C-c n d" . deft)
-  :custom
-  (deft-recursive t)
-  (deft-use-filter-string-for-filename t)
-  (deft-default-extension "org")
-  (deft-directory "~/org/"))
-
-
-(use-package org-journal
-  :ensure t
-  :defer t
-  :init
-  ;; Change default prefix key; needs to be set before loading org-journal
-  (setq org-journal-prefix-key "C-c j ")
-  :config
-  (setq org-journal-dir "~/org/journal/"
-        org-journal-date-format "%A, %d %B %Y"))
 
 
 (use-package undo-tree
@@ -422,7 +422,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :ensure t
-  :defer t
   :init (add-hook 'ibuffer-hook
                   (lambda ()
                     (ibuffer-vc-set-filter-groups-by-vc-root)
