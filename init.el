@@ -40,6 +40,8 @@
 
 (setq auto-save-file-name-transforms
   `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+(setq custom-file (no-littering-expand-etc-file-name "custom.el"))
+
 
 (use-package general
   :ensure t)
@@ -228,6 +230,8 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
 (setq recentf-max-saved-items 100)
+(add-to-list 'recentf-exclude no-littering-var-directory)
+(add-to-list 'recentf-exclude no-littering-etc-directory)
 
 
 ;; Expand-region allows to gradually expand selection inside words, sentences, etc
