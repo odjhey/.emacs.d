@@ -57,3 +57,10 @@
   (select-frame-by-name "capture")
   (switch-to-buffer (get-buffer-create "*scratch*"))
   (org-capture))
+
+
+(defun activate-scratch-frame()
+  "summon the scratch frame"
+  (select-frame-by-name "ze-scratch-frame")
+  (switch-to-buffer (get-buffer-create "*scratch*"))
+  (toggle-frame-maximized))
