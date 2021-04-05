@@ -93,6 +93,8 @@
   (setq marginalia-annotators
         '(marginalia-annotators-heavy marginalia-annotators-light)))
 
+(use-package oceanic-theme
+  :ensure t)
 
 (use-package modus-themes
   :ensure t
@@ -169,21 +171,42 @@
   :bind (:map projectile-mode-map
               ("C-c p" . projectile-command-map)))
 
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(setq recentf-max-saved-items 100)
+
 
 ;; Expand-region allows to gradually expand selection inside words, sentences, etc
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
 
 
+(use-package add-node-modules-path
+  :defer t
+  :hook (((js2-mode rjsx-mode) . add-node-modules-path)))
+
+;; flycheck-eslint still not working :/
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 (use-package js2-mode
-  :config
+  :init
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+
+(add-hook 'js2-mode-hook
+          (defun my-js2-mode-setup ()
+            (flycheck-mode t)
+            (when (executable-find "eslint")
+              (flycheck-select-checker 'javascript-eslint))))
+
 ;; look into adding these
 ;; https://emacs.cafe/emacs/javascript/setup/2017/04/23/emacs-setup-javascript.html
 
+(use-package prettier
+  :hook (((js2-mode rjsx-mode) . prettier-mode)))
 
 (use-package git-gutter)
-
 
 (use-package lsp-mode
   :init
@@ -196,7 +219,9 @@
   :commands lsp)
 
 ;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :defer t
+  :commands lsp-ui-mode)
 
 
 ;; modeline
@@ -259,10 +284,10 @@
 (use-package undo-tree
   :ensure t
   :init
-  (setq undo-tree-visualizer-timestamps t)
-  (setq undo-tree-visualizer-diff t)
+  (global-undo-tree-mode 1)
   :config
-  (global-undo-tree-mode 1))
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t))
 
 
 (use-package origami
@@ -349,18 +374,19 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 ;; unsure what this could offer, im happy with
 ;; prescients fuzzy for now
 
-;; im not yet ready for this haha
-;;(use-package flycheck
-;;  :ensure t
-;;  :init (global-flycheck-mode))
-
 (use-package company
   :ensure t
-  :init (global-company-mode))
+  :init (global-company-mode)
+  :config (setq company-idle-delay 0.1))
 
 (use-package company-lsp
   :after
-  (push 'company-lsp company-backends))
+  (push 'company-lsp company-backends)
+  :config
+  (setq company-lsp-cache-candidates 'auto
+        company-lsp-async t
+        company-lsp-enable-snippet nil
+        company-lsp-enable-recompletion t))
 
 
 ;;; for evaluation
@@ -393,7 +419,17 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (use-package persistent-scratch :ensure t)
 
+;; lsp is good to me so far (gd)
+;; (use-package dumb-jump
+;;   :ensure t)
+
 ;; checkout xr.el
+
+;; (use-package auto-read-only
+;;   :ensure t
+;;   :config
+;;   (auto-read-only-mode 1)
+;;   (add-to-list 'auto-read-only-file-regexps "~/.emacs.d/init.el"))
 
 ;;; Packages-End
 
@@ -591,7 +627,7 @@ _p_rint
   "
 Git gutter:
   _n_: next hunk        _s_tage hunk     _q_uit
-  _p_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
+  _p_: previous hunk    _r_e
   ^ ^                   _P_opup hunk
   _h_: first hunk
   _l_: last hunk        set start _R_evision
@@ -631,6 +667,9 @@ Git gutter:
  "b" '(hydra-buffer/body :which-key "buffers")
  "y" '(hydra-git-gutter/body :which-key "git gutter"))
 
+(general-define-key :states '(insert emacs)
+   "C-." 'company-complete)
+
 (winner-mode +1)
 
 (global-display-fill-column-indicator-mode 1)
@@ -658,3 +697,6 @@ Git gutter:
 (put 'narrow-to-region 'disabled nil)
 
 ;;; init.el ends here
+
+(set-face-attribute 'default nil :height 160)
+(setq initial-major-mode 'org-mode)
