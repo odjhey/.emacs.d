@@ -39,7 +39,7 @@
   :config)
 
 (setq auto-save-file-name-transforms
-  `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
 
 
@@ -111,13 +111,13 @@
 (use-package dimmer
   :ensure t
   :init
-    (dimmer-configure-hydra)
-    (dimmer-configure-magit)
-    (dimmer-configure-org)
-    (dimmer-configure-which-key)
-    (dimmer-configure-posframe)
+  (dimmer-configure-hydra)
+  (dimmer-configure-magit)
+  (dimmer-configure-org)
+  (dimmer-configure-which-key)
+  (dimmer-configure-posframe)
   :config
-    (setq dimmer-fraction 0.50))
+  (setq dimmer-fraction 0.50))
 
 (use-package oceanic-theme
   :ensure t)
@@ -155,8 +155,10 @@
   :config
   (setq org-agenda-files (list "~/org/work.org"
                                "~/org/personal.org"
+                               "~/org/habits.org"
                                "~/org/my.org"))
-  (setq org-archive-location "~/org/archive/%s_archive::"))
+  (setq org-archive-location "~/org/archive/%s_archive::")
+  (global-set-key (kbd "C-c a") 'org-agenda))
 
 
 (use-package org-bullets
@@ -165,7 +167,8 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  (append org-babel-load-languages
-        '((shell . t))))
+         '((shell . t))))
+
 
 (use-package org-roam
   :ensure t
@@ -181,6 +184,7 @@
               (("C-c n i" . org-roam-insert))
               (("C-c n I" . org-roam-insert-immediate))))
 
+
 (use-package deft
   :after org
   :bind
@@ -191,6 +195,7 @@
   (deft-default-extension "org")
   (deft-directory "~/org/"))
 
+
 (use-package org-journal
   :ensure t
   :init
@@ -199,6 +204,21 @@
   :config
   (setq org-journal-dir "~/org/journal/"
         org-journal-date-format "%A, %d %B %Y"))
+
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 9087
+        org-roam-server-authenticate nil
+        org-roam-server-export-inline-images t
+        org-roam-server-serve-files nil
+        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+        org-roam-server-network-poll t
+        org-roam-server-network-arrows nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20))
 
 ;; END <-- ORG Stuff! ---
 
@@ -521,12 +541,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   ;; The `after-revert-hook' is not necessary to use to achieve persistence,
   ;; but it makes the bookmark data in repository more in sync with the file
   ;; state. This hook might cause trouble when using packages
-  ;; that automatically reverts the buffer (like vc after a check-in).
-  ;; This can easily be avoided if the package provides a hook that is
-  ;; called before the buffer is reverted (like `vc-before-checkin-hook').
-  ;; Then new bookmarks can be saved before the buffer is reverted.
-  ;; Make sure bookmarks is saved before check-in (and revert-buffer)
-  (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+  ;; that automatically
 
   :bind (("<f2>" . bm-next)
          ("S-<f2>" . bm-previous)
@@ -722,6 +737,17 @@ _p_rint
    "Editor"
    (("r" read-only-mode "read-only c-x c-q"))))
 
+
+;; Switch To Other Buffer, from Xemacs/files.el
+(defun switch-to-other-buffer (arg)
+  (interactive "p")
+  (if (eq arg 0
+       (bury-buffer (current-buffer))))
+  (switch-to-buffer
+   (if (<= arg 1) (other-buffer (current-buffer))
+      (nth (1+ arg) (buffer-list)))))
+
+
 ;; Buffer management / navigation
 ;; (bind-keys
 ;;  ("s-b" . switch-to-buffer)
@@ -730,7 +756,10 @@ _p_rint
 (pretty-hydra-define hydra-buffer
   (:color blue :quit-key "q" :title "buffers")
   ("Buffer"
-   (("b" switch-to-buffer "switch-to-buffer"))))
+   (("b" switch-to-other-buffer "switch-to-other-buffer")
+    ("v" switch-to-buffer "switch-to-buffer")
+    ("B" ibuffer "ibuffer")
+    ("k" kill-this-buffer "kill-this-buffer"))))
 
 
 (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
@@ -776,7 +805,8 @@ Git gutter:
                     "g" '(magit-status :which-key "magit")
                     "c" '(hydra-control-tower/body :which-key "control tower")
                     "b" '(hydra-buffer/body :which-key "buffers")
-                    "y" '(hydra-git-gutter/body :which-key "git gutter"))
+                    "y" '(hydra-git-gutter/body :which-key "git gutter")
+                    "RET" '(switch-to-other-buffer :which-key "other buffer"))
 
 ;; v v v v v v v
 (general-define-key
@@ -784,7 +814,7 @@ Git gutter:
  "v" 'er/expand-region)
 
 (general-define-key :states '(insert emacs)
-   "C-." 'company-complete)
+                    "C-." 'company-complete)
 
 (winner-mode +1)
 
@@ -807,7 +837,6 @@ Git gutter:
   (file-name-directory user-emacs-directory)
   "orgcapture.el"))
 
-
 (setq frame-resize-pixelwise t)
 
 (put 'narrow-to-region 'disabled nil)
@@ -815,5 +844,7 @@ Git gutter:
 
 ;;; init.el ends here
 
-(set-face-attribute 'default nil :height 160)
+(set-face-attribute 'default nil :height 140)
 (setq initial-major-mode 'org-mode)
+(global-set-key (kbd "C-c k") 'kill-this-buffer)
+(save-place-mode 1)
