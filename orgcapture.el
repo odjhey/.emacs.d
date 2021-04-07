@@ -3,9 +3,9 @@
       '(("t"              ; hotkey
           "Todo list item" ; name
           entry            ; type
-          (file+headline org-default-notes-file "comment Unfiled")
+          ;; (file+headline org-default-notes-file "comment Unfiled")
+          (file+headline "~/org/notes.org" "comment Unfiled")
           "* TODO %?\n \n%U %i\n %a") ;template
-
 
         ("w" ; hotkey
           "(Work) Todo list item" ; name
@@ -20,14 +20,21 @@
         ("a" "Attendance"
           entry (file+olp+datetree "~/org/journal.org" "Attendance")
           "***** %U\n%?")
+
         ("z" ; hotkey
           "capture madness" ; name
           entry ; type
-          (file+headline org-default-notes-file "comment Unfiled")
-          "* TODO %?\n %U\n %i\n %a %(progn (delete-other-windows) \"\")")
+          ;; (file+headline org-default-notes-file "comment Unfiled")
+          "* TODO %?\n %U\n %i\n %a %(progn (delete-other-windows) \"\")")))
 
-        ("m" "email" entry (file+olp org-default-notes-file "comment Unfiled" "mail")
-          "* TODO %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n%a\n")))
+        ;;("m" "email" entry (file+olp org-default-notes-file "comment Unfiled" "mail")
+        ;;  "* TODO %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n%a\n")))
+
+(setq org-refile-targets '((nil :maxlevel . 9
+                                (org-agenda-files :maxlevel . 9))))
+
+(setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+(setq org-refile-use-outline-path t)                  ; Show full paths for refiling
 
 ;; org capture madness!!
 (defadvice org-capture-finalize
@@ -56,3 +63,10 @@
   (select-frame-by-name "capture")
   (switch-to-buffer (get-buffer-create "*scratch*"))
   (org-capture))
+
+
+(defun activate-scratch-frame()
+  "summon the scratch frame"
+  (select-frame-by-name "ze-scratch-frame")
+  (switch-to-buffer (get-buffer-create "*scratch*"))
+  (toggle-frame-maximized))

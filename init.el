@@ -33,6 +33,16 @@
 
 ;;; Packages
 
+(use-package no-littering
+  :ensure t
+  :demand t
+  :config)
+
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+(setq custom-file (no-littering-expand-etc-file-name "custom.el"))
+
+
 (use-package general
   :ensure t)
 
@@ -93,6 +103,24 @@
   (setq marginalia-annotators
         '(marginalia-annotators-heavy marginalia-annotators-light)))
 
+;; Does not currently work, need to read more on it
+;; https://github.com/hlissner/emacs-solaire-mode
+;; (use-package solaire-mode :ensure t
+;;   :init (solaire-global-mode +1))
+
+(use-package dimmer
+  :ensure t
+  :init
+  (dimmer-configure-hydra)
+  (dimmer-configure-magit)
+  (dimmer-configure-org)
+  (dimmer-configure-which-key)
+  (dimmer-configure-posframe)
+  :config
+  (setq dimmer-fraction 0.50))
+
+(use-package oceanic-theme
+  :ensure t)
 
 (use-package modus-themes
   :ensure t
@@ -121,98 +149,26 @@
   (setq magit-repository-directories '(("\~/proj/" . 4) ("\~/proj/work/" . 4))))
 
 
+;; -- ORG Stuff! ---
 (use-package org
   :ensure t
   :config
   (setq org-agenda-files (list "~/org/work.org"
-                               "~/org/index.org"))
-  (setq org-archive-location "org/archive/%s_archive::"))
+                               "~/org/personal.org"
+                               "~/org/habits.org"
+                               "~/org/my.org"))
+  (setq org-archive-location "~/org/archive/%s_archive::")
+  (global-set-key (kbd "C-c a") 'org-agenda))
 
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
-(org-babel-do-load-languages 'org-babel-load-languages
-                             (append org-babel-load-languages '(
-                                                                (shell . t))))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ (append org-babel-load-languages
+         '((shell . t))))
 
-(use-package rainbow-delimiters
-  :ensure t
-  :init
-  (progn
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
-
-
-(use-package no-littering
-  :ensure t
-  :demand t
-  :config)
-
-
-;; I want Emacs kill ring and system clipboard to be independent. Simpleclip is the solution to that.
-(use-package simpleclip
-  :init
-  (simpleclip-mode 1))
-
-
-;; Avy for fast navigation.
-(use-package avy
-  :defer t
-  :config)
-
-
-(use-package projectile
-  :ensure t
-  :init
-  (projectile-mode +1)
-  :bind (:map projectile-mode-map
-              ("C-c p" . projectile-command-map)))
-
-
-;; Expand-region allows to gradually expand selection inside words, sentences, etc
-(use-package expand-region)
-
-
-(use-package js2-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
-
-
-(use-package git-gutter)
-
-
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (js2-mode . lsp-deferred)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
-
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-
-
-;; modeline
-(use-package all-the-icons
-  :ensure t)
-
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1)
-  :config
-  (setq doom-modeline-modal-icon nil)
-  (setq doom-modeline-icon (display-graphic-p))
-  (setq doom-modeline-buffer-state-icon nil)
-  (setq doom-modeline-buffer-modification-icon t)
-  (setq evil-normal-state-tag   (propertize "[Normal]")
-        evil-emacs-state-tag    (propertize "[Emacs]")
-        evil-insert-state-tag   (propertize "[Insert]")
-        evil-motion-state-tag   (propertize "[Motion]")
-        evil-visual-state-tag   (propertize "[Visual]")
-        evil-operator-state-tag (propertize "[Operator]")))
 
 (use-package org-roam
   :ensure t
@@ -242,22 +198,136 @@
 
 (use-package org-journal
   :ensure t
-  :defer t
   :init
   ;; Change default prefix key; needs to be set before loading org-journal
-  (setq org-journal-prefix-key "C-c j ")
+  (setq org-journal-prefix-key "C-c j")
   :config
   (setq org-journal-dir "~/org/journal/"
         org-journal-date-format "%A, %d %B %Y"))
+
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 9087
+        org-roam-server-authenticate nil
+        org-roam-server-export-inline-images t
+        org-roam-server-serve-files nil
+        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+        org-roam-server-network-poll t
+        org-roam-server-network-arrows nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20))
+
+;; END <-- ORG Stuff! ---
+
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (progn
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
+
+
+;; I want Emacs kill ring and system clipboard to be independent. Simpleclip is the solution to that.
+(use-package simpleclip
+  :init
+  (simpleclip-mode 1))
+
+
+;; Avy for fast navigation.
+(use-package avy
+  :config)
+
+
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map)))
+
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(setq recentf-max-saved-items 100)
+(add-to-list 'recentf-exclude no-littering-var-directory)
+(add-to-list 'recentf-exclude no-littering-etc-directory)
+
+
+;; Expand-region allows to gradually expand selection inside words, sentences, etc
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
+
+
+(use-package add-node-modules-path
+  :hook (((js2-mode rjsx-mode) . add-node-modules-path)))
+
+;; flycheck-eslint still not working :/
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+(use-package js2-mode
+  :init
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+
+(add-hook 'js2-mode-hook
+          (defun my-js2-mode-setup ()
+            (flycheck-mode t)
+            (when (executable-find "eslint")
+              (flycheck-select-checker 'javascript-eslint))))
+
+;; look into adding these
+;; https://emacs.cafe/emacs/javascript/setup/2017/04/23/emacs-setup-javascript.html
+
+(use-package prettier
+  :hook (((js2-mode rjsx-mode) . prettier-mode)))
+
+(use-package git-gutter)
+
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (js2-mode . lsp-deferred)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui
+  :commands lsp-ui-mode)
+
+
+;; modeline
+(use-package all-the-icons
+  :ensure t)
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-modal-icon nil)
+  (setq doom-modeline-icon (display-graphic-p))
+  (setq doom-modeline-buffer-state-icon t)
+  (setq doom-modeline-buffer-modification-icon t)
+  (setq evil-normal-state-tag   (propertize "[Normal]")
+        evil-emacs-state-tag    (propertize "[Emacs]")
+        evil-insert-state-tag   (propertize "[Insert]")
+        evil-motion-state-tag   (propertize "[Motion]")
+        evil-visual-state-tag   (propertize "[Visual]")
+        evil-operator-state-tag (propertize "[Operator]")))
+
 
 
 (use-package undo-tree
   :ensure t
   :init
-  (setq undo-tree-visualizer-timestamps t)
-  (setq undo-tree-visualizer-diff t)
+  (global-undo-tree-mode 1)
   :config
-  (global-undo-tree-mode 1))
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t))
 
 
 (use-package origami
@@ -331,10 +401,161 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 ;;   :ensure t)
 ;; (require 'ox-taskjuggler)
 
+;; try embark, consult
+(use-package embark
+  :ensure t)
+
+(use-package consult)
+;; :config
+;; (autoload 'projectile-project-root "projectile")
+;; (setq consult-project-root-function #'projectile-project-root))
+
+;; orderless.el
+;; unsure what this could offer, im happy with
+;; prescients fuzzy for now
+
+(use-package company
+  :ensure t
+  :init (global-company-mode)
+  :config (setq company-idle-delay 0.1))
+
+(use-package company-lsp
+  :after
+  (push 'company-lsp company-backends)
+  :config
+  (setq company-lsp-cache-candidates 'auto
+        company-lsp-async t
+        company-lsp-enable-snippet nil
+        company-lsp-enable-recompletion t))
+
 
 ;;; for evaluation
 ;; org-super-agenda
 
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode t))
+
+;; https://github.com/phillord/phil-emacs-packages/blob/master/eval-pulse.el
+;; (use-package eval-pulse
+;;   :ensure t)
+
+;;; for window management
+;; look at the ff: switch-window.el golden-ratio.el
+
+(use-package ibuffer-vc                 ; Group buffers by VC project and status
+  :ensure t
+  :init (add-hook 'ibuffer-hook
+                  (lambda ()
+                    (ibuffer-vc-set-filter-groups-by-vc-root)
+                    (unless (eq ibuffer-sorting-mode 'alphabetic)
+                      (ibuffer-do-sort-by-alphabetic)))))
+
+;; buffer switching
+;; https://github.com/chimay/torus#use-package
+;; bery interesting, try this out whet you get the time
+(use-package torus
+  :ensure t)
+
+(use-package scratch
+  :ensure t)
+
+(use-package zen-mode
+  :straight (zen-mode :type git :host github :repo "aki237/zen-mode"))
+
+;; look at ^cwm- to customize
+(use-package centered-window :ensure t)
+
+(use-package olivetti :ensure t)
+
+(use-package persistent-scratch :ensure t)
+
+;; lsp is good to me so far (gd)
+;; (use-package dumb-jump
+;;   :ensure t)
+
+;; checkout xr.el
+
+;; looks promising
+;; https://github.com/jacktasia/dumb-jump
+
+(use-package anzu
+  :ensure t
+  :init
+  (global-anzu-mode +1))
+
+(use-package indent-guide)
+
+;; vertigo - rethink about vertical movements
+(use-package spatial-navigate
+  :ensure t)
+
+(general-define-key
+ :states 'normal
+ "C-j" 'spatial-navigate-forward-vertical-bar
+ "C-k" 'spatial-navigate-backward-vertical-bar)
+
+;; rethinnk about this, marks is better imo
+(use-package bm
+  :ensure t
+  :demand t
+
+  :init
+  ;; restore on load (even before you require bm)
+  (setq bm-restore-repository-on-load t)
+
+
+  :config
+  ;; Allow cross-buffer 'next'
+  (setq bm-cycle-all-buffers t)
+
+  ;; where to store persistant files
+  (setq bm-repository-file "~/.emacs.d/bm-repository")
+
+  ;; save bookmarks
+  (setq-default bm-buffer-persistence t)
+
+  ;; Loading the repository from file when on start up.
+  (add-hook 'after-init-hook 'bm-repository-load)
+
+  ;; Saving bookmarks
+  (add-hook 'kill-buffer-hook #'bm-buffer-save)
+
+  ;; Saving the repository to file when on exit.
+  ;; kill-buffer-hook is not called when Emacs is killed, so we
+  ;; must save all bookmarks first.
+  (add-hook 'kill-emacs-hook #'(lambda nil
+                                 (bm-buffer-save-all)
+                                 (bm-repository-save)))
+
+  ;; The `after-save-hook' is not necessary to use to achieve persistence,
+  ;; but it makes the bookmark data in repository more in sync with the file
+  ;; state.
+  (add-hook 'after-save-hook #'bm-buffer-save)
+
+  ;; Restoring bookmarks
+  (add-hook 'find-file-hooks   #'bm-buffer-restore)
+  (add-hook 'after-revert-hook #'bm-buffer-restore)
+
+  ;; The `after-revert-hook' is not necessary to use to achieve persistence,
+  ;; but it makes the bookmark data in repository more in sync with the file
+  ;; state. This hook might cause trouble when using packages
+  ;; that automatically
+
+  :bind (("<f2>" . bm-next)
+         ("S-<f2>" . bm-previous)
+         ("C-<f2>" . bm-toggle)))
+
+;; master narrowing and focus
+(use-package focus
+  :ensure t)
+
+;; (use-package auto-read-only
+;;   :ensure t
+;;   :config
+;;   (auto-read-only-mode 1)
+;;   (add-to-list 'auto-read-only-file-regexps "~/.emacs.d/init.el"))
 
 ;;; Packages-End
 
@@ -392,11 +613,11 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (set-face-attribute 'whitespace-space  nil :background nil :foreground "gray20")
 (set-face-attribute 'whitespace-newline nil :background nil :foreground "gray30")
 (setq whitespace-display-mappings
-  ;; all numbers are Unicode codepoint in decimal. ⁖ (insert-char 182 1)
-  '((space-mark 32 [183] [46]) ; 32 SPACE 「 」, 183 MIDDLE DOT 「·」, 46 FULL STOP 「.」
-    ;;(newline-mark 10 [182 10]) ; 10 LINE FEED
-    (newline-mark ?\n  [?¬ ?\n]  [?$ ?\n])  ; eol - negation
-    (tab-mark 9 [9655 9] [92 9]))) ; 9 TAB, 9655 WHITE RIGHT-POINTING TRIANGLE 「▷」
+      ;; all numbers are Unicode codepoint in decimal. ⁖ (insert-char 182 1)
+      '((space-mark 32 [183] [46]) ; 32 SPACE 「 」, 183 MIDDLE DOT 「·」, 46 FULL STOP 「.」
+        ;;(newline-mark 10 [182 10]) ; 10 LINE FEED
+        (newline-mark ?\n  [?¬ ?\n]  [?$ ?\n])  ; eol - negation
+        (tab-mark 9 [9655 9] [92 9]))) ; 9 TAB, 9655 WHITE RIGHT-POINTING TRIANGLE 「▷」
 
 ;;; Keybindings
 
@@ -479,6 +700,7 @@ _p_rint
 
 
 (defun with-faicon (icon str &optional height v-adjust)
+  "Idk what this does ICON STR HEIGHT V-ADJUST."
   (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
 (pretty-hydra-define hydra-clock
@@ -515,6 +737,17 @@ _p_rint
    "Editor"
    (("r" read-only-mode "read-only c-x c-q"))))
 
+
+;; Switch To Other Buffer, from Xemacs/files.el
+(defun switch-to-other-buffer (arg)
+  (interactive "p")
+  (if (eq arg 0
+       (bury-buffer (current-buffer))))
+  (switch-to-buffer
+   (if (<= arg 1) (other-buffer (current-buffer))
+      (nth (1+ arg) (buffer-list)))))
+
+
 ;; Buffer management / navigation
 ;; (bind-keys
 ;;  ("s-b" . switch-to-buffer)
@@ -523,15 +756,18 @@ _p_rint
 (pretty-hydra-define hydra-buffer
   (:color blue :quit-key "q" :title "buffers")
   ("Buffer"
-    (("b" switch-to-buffer "switch-to-buffer"))))
+   (("b" switch-to-other-buffer "switch-to-other-buffer")
+    ("v" switch-to-buffer "switch-to-buffer")
+    ("B" ibuffer "ibuffer")
+    ("k" kill-this-buffer "kill-this-buffer"))))
 
 
 (defhydra hydra-git-gutter (:body-pre (git-gutter-mode 1)
-                            :hint nil)
+                                      :hint nil)
   "
 Git gutter:
   _n_: next hunk        _s_tage hunk     _q_uit
-  _p_: previous hunk    _r_evert hunk    _Q_uit and deactivate git-gutter
+  _p_: previous hunk    _r_e
   ^ ^                   _P_opup hunk
   _h_: first hunk
   _l_: last hunk        set start _R_evision
@@ -552,31 +788,39 @@ Git gutter:
               ;; clear the markup right away
               (sit-for 0.1)
               (git-gutter:clear))
-       :color blue))
+   :color blue))
 
 
 ;; add hydra for org-refile/ing
 
 (general-define-key :states '(normal visual insert emacs)
- :prefix "SPC"
- :non-normal-prefix "M-SPC"
- ;; hydras first
- "p" '(hydra-projectile/body :which-key "projectile")
- "i" '(hydra-global-org/body :which-key "timers")
- "/" '(hydra-toggles/body :which-key "toggles")
- "t" '(projectile-find-file :which-key "projectile-find-file")
- "f" '(avy-goto-char-timer :which-key "goto char")
- "g" '(magit-status :which-key "magit")
- "c" '(hydra-control-tower/body :which-key "control tower")
- "b" '(hydra-buffer/body :which-key "buffers")
- "y" '(hydra-git-gutter/body :which-key "git gutter"))
- 
+                    :prefix "SPC"
+                    :non-normal-prefix "M-SPC"
+                    ;; hydras first
+                    "p" '(hydra-projectile/body :which-key "projectile")
+                    "i" '(hydra-global-org/body :which-key "timers")
+                    "/" '(hydra-toggles/body :which-key "toggles")
+                    "t" '(projectile-find-file :which-key "projectile-find-file")
+                    "f" '(avy-goto-char-timer :which-key "goto char")
+                    "g" '(magit-status :which-key "magit")
+                    "c" '(hydra-control-tower/body :which-key "control tower")
+                    "b" '(hydra-buffer/body :which-key "buffers")
+                    "y" '(hydra-git-gutter/body :which-key "git gutter")
+                    "RET" '(switch-to-other-buffer :which-key "other buffer"))
+
+;; v v v v v v v
+(general-define-key
+ :states 'visual
+ "v" 'er/expand-region)
+
+(general-define-key :states '(insert emacs)
+                    "C-." 'company-complete)
 
 (winner-mode +1)
 
 (global-display-fill-column-indicator-mode 1)
 (global-display-line-numbers-mode 1)
-(global-hl-line-mode 1)
+(hl-line-mode 1)
 (global-visual-line-mode t)
 (global-auto-revert-mode t)
 (setq-default truncate-lines t)
@@ -585,9 +829,7 @@ Git gutter:
 ;; (setq display-line-numbers-type 'relative)
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-
 (setq org-default-notes-file "~/org/my.org")
-
 
 ;; Org capture
 (load-file
@@ -595,7 +837,14 @@ Git gutter:
   (file-name-directory user-emacs-directory)
   "orgcapture.el"))
 
-
 (setq frame-resize-pixelwise t)
 
 (put 'narrow-to-region 'disabled nil)
+(setq initial-buffer-choice t)
+
+;;; init.el ends here
+
+(set-face-attribute 'default nil :height 140)
+(setq initial-major-mode 'org-mode)
+(global-set-key (kbd "C-c k") 'kill-this-buffer)
+(save-place-mode 1)

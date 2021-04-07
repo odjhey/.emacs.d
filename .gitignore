@@ -5,3 +5,5 @@ var/
 etc/
 saveplace
 custom.el
+elpa/
+bm-repository
