@@ -30,8 +30,8 @@
         ;;("m" "email" entry (file+olp org-default-notes-file "comment Unfiled" "mail")
         ;;  "* TODO %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n%a\n")))
 
-(setq org-refile-targets '((nil :maxlevel . 9
-                                (org-agenda-files :maxlevel . 9))))
+(setq org-refile-targets '((nil :maxlevel . 9)
+                           (org-agenda-files :maxlevel . 9)))
 
 (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
 (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
